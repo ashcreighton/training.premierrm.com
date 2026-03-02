@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>H&B Builders - Site Orientation Video</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: #1a1a1a;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            width: 100%;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+            color: #ffffff;
+        }
+        
+        .header p {
+            font-size: 16px;
+            color: #999999;
+        }
+        
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            background: #000000;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+        
+        video {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 18px;
+            color: #ffffff;
+        }
+        
+        .redirect-message {
+            display: none;
+            text-align: center;
+            padding: 40px 20px;
+            background: #2a2a2a;
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+        
+        .redirect-message.show {
+            display: block;
+        }
+        
+        .redirect-message h2 {
+            font-size: 22px;
+            margin-bottom: 12px;
+            color: #4CAF50;
+        }
+        
+        .redirect-message p {
+            font-size: 16px;
+            color: #cccccc;
+            margin-bottom: 8px;
+        }
+        
+        .countdown {
+            font-size: 32px;
+            font-weight: bold;
+            color: #4CAF50;
+            margin: 20px 0;
+        }
+        
+        .manual-link {
+            margin-top: 20px;
+        }
+        
+        .manual-link a {
+            color: #4CAF50;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 16px;
+            padding: 12px 24px;
+            border: 2px solid #4CAF50;
+            border-radius: 8px;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        
+        .manual-link a:hover {
+            background: #4CAF50;
+            color: #ffffff;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #666666;
+            font-size: 14px;
+        }
+        
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 20px;
+            }
+            
+            .header p {
+                font-size: 14px;
+            }
+            
+            .redirect-message h2 {
+                font-size: 18px;
+            }
+            
+            .redirect-message p {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>H&B Builders - Site Orientation Video</h1>
+            <p>Please watch the entire video to access the acknowledgement form.</p>
+        </div>
+        
+        <div class="video-wrapper">
+            <video id="orientationVideo" controls playsinline preload="auto">
+                <source src="https://www.dropbox.com/scl/fi/5qom6z1f1ewntj9ntye7h/HB-Builders-ENG-FINAL.mp4?rlkey=0a40tclz9iqv0k7ntc04jtja1&st=m35ok6hd&dl=1" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <div class="loading" id="loadingText">Loading video...</div>
+        </div>
+        
+        <div class="redirect-message" id="redirectMessage">
+            <h2>✓ Video Complete!</h2>
+            <p>Thank you for watching the orientation video.</p>
+            <p>Redirecting to acknowledgement form in:</p>
+            <div class="countdown" id="countdown">3</div>
+            <div class="manual-link">
+                <a href="https://form.jotform.com/260404412904043" id="manualLink">Click here if not redirected automatically</a>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>© 2026 Premier Risk Management</p>
+        </div>
+    </div>
+
+    <script>
+        const video = document.getElementById('orientationVideo');
+        const loadingText = document.getElementById('loadingText');
+        const redirectMessage = document.getElementById('redirectMessage');
+        const countdownElement = document.getElementById('countdown');
+        const jotformUrl = 'https://form.jotform.com/260404412904043';
+        
+        // Hide loading text when video is ready
+        video.addEventListener('loadeddata', function() {
+            loadingText.style.display = 'none';
+        });
+        
+        // When video ends, show redirect message and countdown
+        video.addEventListener('ended', function() {
+            redirectMessage.classList.add('show');
+            
+            let countdown = 3;
+            const countdownInterval = setInterval(function() {
+                countdown--;
+                countdownElement.textContent = countdown;
+                
+                if (countdown <= 0) {
+                    clearInterval(countdownInterval);
+                    // Redirect to JotForm
+                    window.location.href = jotformUrl;
+                }
+            }, 1000);
+        });
+        
+        // Error handling
+        video.addEventListener('error', function() {
+            loadingText.textContent = 'Error loading video. Please try again.';
+            loadingText.style.color = '#ff4444';
+        });
+    </script>
+</body>
+</html>
