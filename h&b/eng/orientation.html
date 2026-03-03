@@ -260,10 +260,14 @@
     /* ----------------------------
        LOADING STATES
     -----------------------------*/
-    video.addEventListener('loadeddata', function () {
+    video.addEventListener('loadedmetadata', function () {
         loadingText.style.display = 'none';
     });
 
+    video.addEventListener('play', function () {
+        loadingText.style.display = 'none';
+    });
+    
     video.addEventListener('waiting', function () {
         loadingText.style.display = 'block';
     });
