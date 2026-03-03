@@ -231,20 +231,22 @@
 
     let maxWatchedTime = 0;
 
-     /* ----------------------------
-       LOADING STATES
-    -----------------------------*/
-
-video.addEventListener('loadedmetadata', function () {
-    // Metadata loaded — allow user interaction
-});
-
-video.addEventListener('play', function () {
+/* ----------------------------
+   LOADING STATES (Safe & Mobile Friendly)
+-----------------------------*/
+function hideSpinner() {
     loadingText.style.display = 'none';
-});
+}
 
+// Hide spinner once the video actually has data and can play
+video.addEventListener('canplay', hideSpinner);
+video.addEventListener('canplaythrough', hideSpinner);
+
+// Show spinner during buffering, but only if not ended
 video.addEventListener('waiting', function () {
-    loadingText.style.display = 'block';
+    if (!video.ended) {
+        loadingText.style.display = 'block';
+    }
 });
 
     /* ----------------------------
