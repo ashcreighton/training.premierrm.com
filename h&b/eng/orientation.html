@@ -192,11 +192,11 @@
     <div class="container">
         <div class="header">
             <h1>H&B Builders — Site Orientation Video</h1>
-            <p>Please watch the entire video to access the acknowledgement form.</p>
+            <p>Please watch the entire video to access the acknowledgment form.</p>
         </div>
         
         <div class="video-wrapper">
-            <video id="orientationVideo" controls playsinline preload="metadata">
+            <video id="orientationVideo" controls playsinline preload="auto">
                 <source src="https://pub-5284e10c26b046a68b42e34ee0846d65.r2.dev/orientation_eng_compressed.mp4" type="video/mp4">
                 Your browser does not support the video tag.
             </video>
@@ -239,22 +239,27 @@
         let maxWatchedTime = 0;
         
         // Show buffering progress
-        video.addEventListener('progress', function() {
-            if (video.buffered.length > 0) {
-                const bufferedEnd = video.buffered.end(video.buffered.length - 1);
-                const duration = video.duration;
-                if (duration > 0) {
-                    const percentBuffered = Math.round((bufferedEnd / duration) * 100);
-                    bufferProgress.textContent = `${percentBuffered}%`;
-                    progressBarFill.style.width = `${percentBuffered}%`;
-                }
-            }
-        });
+function updateBufferProgress() {
+    if (video.duration > 0 && video.buffered.length > 0) {
+        const bufferedEnd = video.buffered.end(video.buffered.length - 1);
+        const percentBuffered = Math.min(
+            Math.round((bufferedEnd / video.duration) * 100),
+            100
+        );
+
+        bufferProgress.textContent = percentBuffered + '%';
+        progressBarFill.style.width = percentBuffered + '%';
+    }
+}
+
+video.addEventListener('progress', updateBufferProgress);
+video.addEventListener('loadedmetadata', updateBufferProgress);
+video.addEventListener('loadeddata', updateBufferProgress);
         
         // Hide loading text when video can start playing
-        video.addEventListener('canplay', function() {
-            loadingText.style.display = 'none';
-        });
+video.addEventListener('loadeddata', function() {
+    loadingText.style.display = 'none';
+});
         
         // Show loading spinner again if buffering during playback
         video.addEventListener('waiting', function() {
