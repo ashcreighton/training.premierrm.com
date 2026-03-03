@@ -234,11 +234,12 @@
      /* ----------------------------
        LOADING STATES
     -----------------------------*/
+
 video.addEventListener('loadedmetadata', function () {
-    video.play().catch(() => {});
+    // Metadata loaded — allow user interaction
 });
 
-video.addEventListener('playing', function () {
+video.addEventListener('play', function () {
     loadingText.style.display = 'none';
 });
 
