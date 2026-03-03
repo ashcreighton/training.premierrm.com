@@ -64,8 +64,6 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 18px;
-            color: #ffffff;
             text-align: center;
         }
         
@@ -76,36 +74,12 @@
             width: 40px;
             height: 40px;
             animation: spin 1s linear infinite;
-            margin: 0 auto 16px auto;
+            margin: 0 auto;
         }
         
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
-        }
-        
-        .buffer-progress {
-            margin-top: 12px;
-            font-size: 14px;
-            color: #4CAF50;
-        }
-        
-        .progress-bar-container {
-            width: 80%;
-            max-width: 400px;
-            height: 8px;
-            background: #333333;
-            border-radius: 4px;
-            margin: 16px auto 8px auto;
-            overflow: hidden;
-        }
-        
-        .progress-bar-fill {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, #4CAF50, #66BB6A);
-            transition: width 0.3s ease;
-            border-radius: 4px;
         }
         
         .redirect-message {
@@ -192,18 +166,16 @@
     <div class="container">
         <div class="header">
             <h1>H&B Builders — Site Orientation Video</h1>
-            <p>Please watch the entire video to access the acknowledgment form.</p>
+            <p>Please watch the entire video to proceed to acknowledgment form submission page.</p>
         </div>
         
         <div class="video-wrapper">
-            <video id="orientationVideo" controls playsinline preload="auto">
+            <video id="orientationVideo" controls playsinline preload="metadata">
                 <source src="https://pub-5284e10c26b046a68b42e34ee0846d65.r2.dev/orientation_eng_compressed.mp4" type="video/mp4">
                 Your browser does not support the video tag.
             </video>
             <div class="loading" id="loadingText">
                 <div class="loading-spinner"></div>
-                <div>Loading video...</div>
-                <div style="font-size: 14px; margin-top: 8px; color: #999;">This may take a moment on cellular data</div>
             </div>
         </div>
         
@@ -222,70 +194,68 @@
         </div>
     </div>
 
-<script>
-    const video = document.getElementById('orientationVideo');
-    const loadingText = document.getElementById('loadingText');
-    const redirectMessage = document.getElementById('redirectMessage');
-    const countdownElement = document.getElementById('countdown');
-    const jotformUrl = 'https://form.jotform.com/260404412904043';
-
-    let maxWatchedTime = 0;
-
-/* ----------------------------
-   LOADING STATES (Safe & Mobile Friendly)
------------------------------*/
-function hideSpinner() {
-    loadingText.style.display = 'none';
-}
-
-// Hide spinner once the video actually has data and can play
-video.addEventListener('canplay', hideSpinner);
-video.addEventListener('canplaythrough', hideSpinner);
-
-// Show spinner during buffering, but only if not ended
-video.addEventListener('waiting', function () {
-    if (!video.ended) {
-        loadingText.style.display = 'block';
-    }
-});
-
-    /* ----------------------------
-       TRACK WATCH PROGRESS
-    -----------------------------*/
-    video.addEventListener('timeupdate', function () {
-        if (video.currentTime > maxWatchedTime) {
-            maxWatchedTime = video.currentTime;
-        }
-    });
-
-    /* ----------------------------
-       SAFE SKIP PREVENTION
-       (Prevents real skipping but
-        allows tiny browser seeks)
-    -----------------------------*/
-    video.addEventListener('seeking', function () {
-        if (video.currentTime > maxWatchedTime + 0.5) {
-            video.currentTime = maxWatchedTime;
-        }
-    });
-
-    /* ----------------------------
-       REDIRECT WHEN COMPLETE
-    -----------------------------*/
-    video.addEventListener('ended', function () {
-        redirectMessage.classList.add('show');
-
-        let countdown = 3;
-        const countdownInterval = setInterval(function () {
-            countdown--;
-            countdownElement.textContent = countdown;
-
-            if (countdown <= 0) {
-                clearInterval(countdownInterval);
-                window.location.href = jotformUrl;
+    <script>
+        const video = document.getElementById('orientationVideo');
+        const loadingText = document.getElementById('loadingText');
+        const redirectMessage = document.getElementById('redirectMessage');
+        const countdownElement = document.getElementById('countdown');
+        const jotformUrl = 'https://form.jotform.com/260404412904043';
+        
+        // Track the furthest point the user has watched
+        let maxWatchedTime = 0;
+        
+        // Function to hide loading spinner
+        function hideLoading() {
+            if (loadingText) {
+                loadingText.style.display = 'none';
             }
-        }, 1000);
-    });
-</script>
+        }
+        
+        // Check if video is already loaded (script ran after metadata loaded)
+        if (video.readyState >= 1) {
+            hideLoading();
+        }
+        
+        // Hide loading spinner when video metadata is loaded
+        video.addEventListener('loadedmetadata', hideLoading);
+        
+        // Backup: also hide on canplay
+        video.addEventListener('canplay', hideLoading);
+        
+        // Update the maximum watched time as video plays
+        video.addEventListener('timeupdate', function() {
+            if (video.currentTime > maxWatchedTime) {
+                maxWatchedTime = video.currentTime;
+            }
+        });
+        
+/*        // Prevent skipping ahead - user can only watch sequentially
+        video.addEventListener('seeking', function() {
+            if (video.currentTime > maxWatchedTime) {
+                video.currentTime = maxWatchedTime;
+            }
+        });*/
+        
+        // When video ends, show redirect message and countdown
+        video.addEventListener('ended', function() {
+            redirectMessage.classList.add('show');
+            
+            let countdown = 3;
+            const countdownInterval = setInterval(function() {
+                countdown--;
+                countdownElement.textContent = countdown;
+                
+                if (countdown <= 0) {
+                    clearInterval(countdownInterval);
+                    window.location.href = jotformUrl;
+                }
+            }, 1000);
+        });
+        
+        // Simple error handling
+        video.addEventListener('error', function() {
+            loadingText.innerHTML = '<div style="color: #ff4444; font-size: 16px;">Error loading video</div>';
+        });
+    </script>
 </body>
 </html>
