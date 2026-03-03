@@ -204,10 +204,6 @@
                 <div class="loading-spinner"></div>
                 <div>Loading video...</div>
                 <div style="font-size: 14px; margin-top: 8px; color: #999;">This may take a moment on cellular data</div>
-                <div class="progress-bar-container">
-                    <div class="progress-bar-fill" id="progressBarFill"></div>
-                </div>
-                <div class="buffer-progress" id="bufferProgress">0%</div>
             </div>
         </div>
         
@@ -229,57 +225,26 @@
 <script>
     const video = document.getElementById('orientationVideo');
     const loadingText = document.getElementById('loadingText');
-    const bufferProgress = document.getElementById('bufferProgress');
-    const progressBarFill = document.getElementById('progressBarFill');
     const redirectMessage = document.getElementById('redirectMessage');
     const countdownElement = document.getElementById('countdown');
     const jotformUrl = 'https://form.jotform.com/260404412904043';
 
     let maxWatchedTime = 0;
 
-    /* ----------------------------
-       BUFFER PROGRESS (Stable)
-    -----------------------------*/
-    function updateBufferProgress() {
-        if (video.duration > 0 && video.buffered.length > 0) {
-            const bufferedEnd = video.buffered.end(video.buffered.length - 1);
-            const percentBuffered = Math.min(
-                Math.round((bufferedEnd / video.duration) * 100),
-                100
-            );
-
-            bufferProgress.textContent = percentBuffered + '%';
-            progressBarFill.style.width = percentBuffered + '%';
-        }
-    }
-
-    video.addEventListener('progress', updateBufferProgress);
-    video.addEventListener('loadedmetadata', updateBufferProgress);
-    video.addEventListener('loadeddata', updateBufferProgress);
-
-    /* ----------------------------
+     /* ----------------------------
        LOADING STATES
     -----------------------------*/
-    video.addEventListener('loadedmetadata', function () {
-        loadingText.style.display = 'none';
-    });
+video.addEventListener('loadedmetadata', function () {
+    video.play().catch(() => {});
+});
 
-    video.addEventListener('play', function () {
-        loadingText.style.display = 'none';
-    });
-    
-    video.addEventListener('waiting', function () {
-        loadingText.style.display = 'block';
-    });
+video.addEventListener('playing', function () {
+    loadingText.style.display = 'none';
+});
 
-    video.addEventListener('playing', function () {
-        loadingText.style.display = 'none';
-    });
-
-    video.addEventListener('error', function () {
-        loadingText.style.display = 'block';
-        loadingText.innerHTML = '<div style="color:#ff4444;">Error loading video. Please check your connection and try again.</div>';
-    });
+video.addEventListener('waiting', function () {
+    loadingText.style.display = 'block';
+});
 
     /* ----------------------------
        TRACK WATCH PROGRESS
