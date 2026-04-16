@@ -229,12 +229,12 @@
             }
         });
         
-/*        // Prevent skipping ahead - user can only watch sequentially
+// Prevent skipping ahead - user can only watch sequentially
         video.addEventListener('seeking', function() {
             if (video.currentTime > maxWatchedTime) {
                 video.currentTime = maxWatchedTime;
             }
-        });*/
+        });
         
         // When video ends, show redirect message and countdown
         video.addEventListener('ended', function() {
