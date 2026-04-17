@@ -194,85 +194,75 @@
         </div>
     </div>
 
-    <script>
-        const video = document.getElementById('orientationVideo');
-        const loadingText = document.getElementById('loadingText');
-        const redirectMessage = document.getElementById('redirectMessage');
-        const countdownElement = document.getElementById('countdown');
-        const jotformUrl = 'https://form.jotform.com/260404412904043';
-        
-        // Track the furthest point the user has watched
-        let maxWatchedTime = 0;
-        
-        // Function to hide loading spinner
-        function hideLoading() {
-            if (loadingText) {
-                loadingText.style.display = 'none';
-            }
+<script>
+    const video = document.getElementById('orientationVideo');
+    const loadingText = document.getElementById('loadingText');
+    const redirectMessage = document.getElementById('redirectMessage');
+    const countdownElement = document.getElementById('countdown');
+    const jotformUrl = 'https://form.jotform.com/260404412904043';
+    
+    // Track the furthest point the user has watched
+    let maxWatchedTime = 0;
+    let isSeeking = false;
+    
+    // Function to hide loading spinner
+    function hideLoading() {
+        if (loadingText) {
+            loadingText.style.display = 'none';
         }
-        
-        // Check if video is already loaded (script ran after metadata loaded)
-        if (video.readyState >= 1) {
-            hideLoading();
+    }
+    
+    // Check if video is already loaded
+    if (video.readyState >= 1) {
+        hideLoading();
+    }
+    
+    // Hide loading spinner when video metadata is loaded
+    video.addEventListener('loadedmetadata', hideLoading);
+    
+    // Backup: also hide on canplay
+    video.addEventListener('canplay', hideLoading);
+    
+    // Track when seeking starts
+    video.addEventListener('seeking', function() {
+        isSeeking = true;
+    });
+    
+    // Prevent skipping ahead - check AFTER seek completes
+    video.addEventListener('seeked', function() {
+        if (video.currentTime > maxWatchedTime) {
+            video.currentTime = maxWatchedTime;
         }
+        isSeeking = false;
+    });
+    
+    // Update the maximum watched time (but not while seeking)
+    video.addEventListener('timeupdate', function() {
+        if (!isSeeking && video.currentTime > maxWatchedTime) {
+            maxWatchedTime = video.currentTime;
+        }
+    });
+    
+    // When video ends, show redirect message and countdown
+    video.addEventListener('ended', function() {
+        redirectMessage.classList.add('show');
         
-        // Hide loading spinner when video metadata is loaded
-        video.addEventListener('loadedmetadata', hideLoading);
-        
-        // Backup: also hide on canplay
-        video.addEventListener('canplay', hideLoading);
-        
-        // Update the maximum watched time as video plays (but not while seeking)
-        let isSeeking = false;
-
-        video.addEventListener('seeking', function() {
-            isSeeking = true;
-        });
-
-        video.addEventListener('seeked', function() {
-            isSeeking = false;
-        });
-
-        video.addEventListener('timeupdate', function() {
-            if (!isSeeking && video.currentTime > maxWatchedTime) {
-                maxWatchedTime = video.currentTime;
-            }
-        });
-
-        // Prevent skipping ahead - user can only watch sequentially
-        video.addEventListener('seeking', function() {
-            if (video.currentTime > maxWatchedTime) {
-                video.currentTime = maxWatchedTime;
-            }
-        });
-        
-    // Prevent skipping ahead - user can only watch sequentially
-        video.addEventListener('seeking', function() {
-            if (video.currentTime > maxWatchedTime) {
-                video.currentTime = maxWatchedTime;
-            }
-        });
-        
-        // When video ends, show redirect message and countdown
-        video.addEventListener('ended', function() {
-            redirectMessage.classList.add('show');
+        let countdown = 3;
+        const countdownInterval = setInterval(function() {
+            countdown--;
+            countdownElement.textContent = countdown;
             
-            let countdown = 3;
-            const countdownInterval = setInterval(function() {
-                countdown--;
-                countdownElement.textContent = countdown;
-                
-                if (countdown <= 0) {
-                    clearInterval(countdownInterval);
-                    window.location.href = jotformUrl;
-                }
-            }, 1000);
-        });
-        
-        // Simple error handling
-        video.addEventListener('error', function() {
-            loadingText.innerHTML = '<div style="color: #ff4444; font-size: 16px;">Error loading video</div>';
-        });
-    </script>
+            if (countdown <= 0) {
+                clearInterval(countdownInterval);
+                window.location.href = jotformUrl;
+            }
+        }, 1000);
+    });
+    
+    // Simple error handling
+    video.addEventListener('error', function() {
+        loadingText.innerHTML = '<div style="color: #ff4444; font-size: 16px;">Error loading video</div>';
+    });
+</script>
 </body>
 </html>
