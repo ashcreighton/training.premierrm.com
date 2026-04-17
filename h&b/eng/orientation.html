@@ -202,23 +202,31 @@
     const jotformUrl = 'https://form.jotform.com/260404412904043';
     
     let maxWatchedTime = 0;
+    let lastValidTime = 0;
     
     // Hide loading spinner
     video.addEventListener('loadedmetadata', function() {
         if (loadingText) loadingText.style.display = 'none';
     });
     
-    // Track furthest point watched
-    video.addEventListener('timeupdate', function() {
-        if (video.currentTime > maxWatchedTime) {
-            maxWatchedTime = video.currentTime;
-        }
+    // Only update max time when video is actually playing
+    video.addEventListener('playing', function() {
+        const updateInterval = setInterval(function() {
+            if (video.paused || video.ended) {
+                clearInterval(updateInterval);
+                return;
+            }
+            if (video.currentTime > maxWatchedTime) {
+                maxWatchedTime = video.currentTime;
+                lastValidTime = video.currentTime;
+            }
+        }, 100);
     });
     
     // Prevent skipping ahead
-    video.addEventListener('seeking', function() {
-        if (video.currentTime > maxWatchedTime) {
-            video.currentTime = maxWatchedTime;
+    video.addEventListener('seeked', function() {
+        if (video.currentTime > maxWatchedTime + 0.5) {
+            video.currentTime = lastValidTime;
         }
     });
     
