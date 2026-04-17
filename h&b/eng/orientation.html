@@ -222,10 +222,27 @@
         // Backup: also hide on canplay
         video.addEventListener('canplay', hideLoading);
         
-        // Update the maximum watched time as video plays
+        // Update the maximum watched time as video plays (but not while seeking)
+        let isSeeking = false;
+
+        video.addEventListener('seeking', function() {
+            isSeeking = true;
+        });
+
+        video.addEventListener('seeked', function() {
+            isSeeking = false;
+        });
+
         video.addEventListener('timeupdate', function() {
-            if (video.currentTime > maxWatchedTime) {
+            if (!isSeeking && video.currentTime > maxWatchedTime) {
                 maxWatchedTime = video.currentTime;
+            }
+        });
+
+        // Prevent skipping ahead - user can only watch sequentially
+        video.addEventListener('seeking', function() {
+            if (video.currentTime > maxWatchedTime) {
+                video.currentTime = maxWatchedTime;
             }
         });
         
