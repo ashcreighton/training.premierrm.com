@@ -194,68 +194,58 @@
         </div>
     </div>
 
-    <script>
-        const video = document.getElementById('orientationVideo');
-        const loadingText = document.getElementById('loadingText');
-        const redirectMessage = document.getElementById('redirectMessage');
-        const countdownElement = document.getElementById('countdown');
-        const jotformUrl = 'https://form.jotform.com/260404627767159';
-        
-        // Track the furthest point the user has watched
-        let maxWatchedTime = 0;
-        
-        // Function to hide loading spinner
-        function hideLoading() {
-            if (loadingText) {
-                loadingText.style.display = 'none';
-            }
+ <script>
+    const video = document.getElementById('orientationVideo');
+    const loadingText = document.getElementById('loadingText');
+    const redirectMessage = document.getElementById('redirectMessage');
+    const countdownElement = document.getElementById('countdown');
+    const jotformUrl = 'https://form.jotform.com/260404412904043';
+
+    let maxWatchedTime = 0;
+    const ALLOWANCE = 0.5; // small buffer to avoid glitchy snapping
+
+    // Hide loading spinner
+    video.addEventListener('loadedmetadata', () => {
+        if (loadingText) loadingText.style.display = 'none';
+    });
+
+    // Track progress more reliably
+    video.addEventListener('timeupdate', () => {
+        if (!video.seeking) {
+            maxWatchedTime = Math.max(maxWatchedTime, video.currentTime);
         }
-        
-        // Check if video is already loaded (script ran after metadata loaded)
-        if (video.readyState >= 1) {
-            hideLoading();
+    });
+
+    // Intercept skipping
+    video.addEventListener('seeking', () => {
+        if (video.currentTime > maxWatchedTime + ALLOWANCE) {
+            video.currentTime = maxWatchedTime;
         }
-        
-        // Hide loading spinner when video metadata is loaded
-        video.addEventListener('loadedmetadata', hideLoading);
-        
-        // Backup: also hide on canplay
-        video.addEventListener('canplay', hideLoading);
-        
-        // Update the maximum watched time as video plays
-        video.addEventListener('timeupdate', function() {
-            if (video.currentTime > maxWatchedTime) {
-                maxWatchedTime = video.currentTime;
+    });
+
+    // Extra safety: pause if they somehow slip ahead
+    video.addEventListener('seeked', () => {
+        if (video.currentTime > maxWatchedTime + ALLOWANCE) {
+            video.pause();
+            video.currentTime = maxWatchedTime;
+        }
+    });
+
+    // Redirect when video ends
+    video.addEventListener('ended', () => {
+        redirectMessage.classList.add('show');
+        let countdown = 3;
+
+        const countdownInterval = setInterval(() => {
+            countdown--;
+            countdownElement.textContent = countdown;
+
+            if (countdown <= 0) {
+                clearInterval(countdownInterval);
+                window.location.href = jotformUrl;
             }
-        });
-        
-// Prevent skipping ahead - user can only watch sequentially
-        video.addEventListener('seeking', function() {
-            if (video.currentTime > maxWatchedTime) {
-                video.currentTime = maxWatchedTime;
-            }
-        });
-        
-        // When video ends, show redirect message and countdown
-        video.addEventListener('ended', function() {
-            redirectMessage.classList.add('show');
-            
-            let countdown = 3;
-            const countdownInterval = setInterval(function() {
-                countdown--;
-                countdownElement.textContent = countdown;
-                
-                if (countdown <= 0) {
-                    clearInterval(countdownInterval);
-                    window.location.href = jotformUrl;
-                }
-            }, 1000);
-        });
-        
-        // Simple error handling
-        video.addEventListener('error', function() {
-            loadingText.innerHTML = '<div style="color: #ff4444; font-size: 16px;">Error al cargar el video</div>';
-        });
-    </script>
+        }, 1000);
+    });
+</script>
 </body>
 </html>
